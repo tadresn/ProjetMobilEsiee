@@ -1,19 +1,21 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import React from 'react';
 
-import DetailsScreen from '../screens/DetailsScreen';
-import HomeScreen from '../screens/HomeScreen';
+import HealthGoals from '../screens/HealthGoals';
+import FoodDatabase from '../screens/FoodDatabase';
+import MealPlanning from '../screens/MealPlanning';
 
-const Stack = createNativeStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
-      </Stack.Navigator>
+      <Tab.Navigator>
+        <Tab.Screen name="HealthGoals" component={HealthGoals} />
+        <Tab.Screen name="FoodDatabase" component={FoodDatabase} />
+        <Tab.Screen name="MealPlanning" component={MealPlanning} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 };
