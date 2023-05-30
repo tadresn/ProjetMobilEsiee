@@ -1,7 +1,7 @@
 import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Switch, TextInput } from 'react-native-paper';
+import { Button, Switch, TextInput } from 'react-native-paper';
 
 const HealthGoals = () => {
   const [age, setAge] = useState('');
@@ -11,6 +11,20 @@ const HealthGoals = () => {
   const [weight, setWeight] = useState('');
   const [activityLevel, setActivityLevel] = useState('Sedentary');
   const [healthGoal, setHealthGoal] = useState('Weight Loss');
+  const [BMR, setBMR] = useState(0);
+  function calculateBMR(age, isMale, height, weight, activityLevel, healthGoal) {
+    let BMR = 0;
+    if (isMale) BMR = 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
+    else BMR = 447.593 + 9.247 * weight + 3.098 * height - 4.33 * age;
+    if (activityLevel === 'Sedentary') BMR *= 1.2;
+    else if (activityLevel === 'Light Exercice') BMR *= 1.375;
+    else if (activityLevel === 'Moderate Exercice') BMR *= 1.55;
+    else if (activityLevel === 'Heavy Exercice') BMR *= 1.725;
+    else if (activityLevel === 'Extra active') BMR *= 1.9;
+    if (healthGoal === 'Weight Loss') BMR -= 500;
+    else if (healthGoal === 'Weight Gain') BMR += 500;
+    return Math.round(BMR);
+  }
   return (
     <View>
       <TextInput label="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
@@ -40,7 +54,11 @@ const HealthGoals = () => {
         <Picker.Item label="Weight Maintenance" value="Weight Maintenance" />
         <Picker.Item label="Weight Gain" value="Weight Gain" />
       </Picker>
-      <Text>Welcome to the HealthGoals Screen!</Text>
+      <Button
+        title="calculateBMR"
+        onPress={() => setBMR(calculateBMR(age, isMale, height, weight, activityLevel, healthGoal))}
+      />
+      <Text>BMR : {BMR} calories/day</Text>
     </View>
   );
 };
