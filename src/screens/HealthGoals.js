@@ -1,6 +1,6 @@
 import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import { Button, Switch, TextInput } from 'react-native-paper';
 
 const HealthGoals = () => {
@@ -55,71 +55,75 @@ const HealthGoals = () => {
   }, [age, height, weight]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Health Goals</Text>
-      <TextInput
-        label="Age"
-        value={age}
-        onChangeText={setAge}
-        keyboardType="numeric"
-        style={styles.decalageBottom}
-      />
-      <View style={styles.switchContainer}>
-        <Text style={styles.switchLabel}>Are you a male ?</Text>
-        <Switch
-          trackColor={{ false: '#767577', true: '#d1c4e9' }}
-          thumbColor={isMale ? '#ff4081' : '#f4f3f4'}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isMale}
+    <SafeAreaView>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Health Goals</Text>
+        <TextInput
+          label="Age"
+          value={age}
+          onChangeText={setAge}
+          keyboardType="numeric"
+          style={styles.decalageBottom}
         />
-      </View>
-      <TextInput
-        label="Height"
-        value={height}
-        onChangeText={setHeight}
-        keyboardType="numeric"
-        style={styles.decalageBottom}
-      />
-      <TextInput
-        label="Weight"
-        value={weight}
-        onChangeText={setWeight}
-        keyboardType="numeric"
-        style={styles.decalageBottom}
-      />
-      <View style={styles.decalageBottom}>
-        <Text style={styles.pickerLabel}>Activity Level</Text>
-        <Picker
-          selectedValue={activityLevel}
-          onValueChange={(itemValue) => setActivityLevel(itemValue)}
-          itemStyle={styles.pickerItem}
-          numberOfLines={2}>
-          {Array.from(allActivityLevels, ([key, value]) => (
-            <Picker.Item key={value} label={value} value={value} />
-          ))}
-        </Picker>
-      </View>
-      <View style={styles.decalageBottom}>
-        <Text style={styles.pickerLabel}>Health Goal</Text>
-        <Picker
-          selectedValue={healthGoal}
-          onValueChange={(itemValue) => setHealthGoal(itemValue)}
-          itemStyle={styles.pickerItem}>
-          {Array.from(allHealthGoals, ([key, value]) => (
-            <Picker.Item key={value} label={value} value={value} />
-          ))}
-        </Picker>
-      </View>
-      <Button
-        onPress={() => setBMR(calculateBMR(age, isMale, height, weight, activityLevel, healthGoal))}
-        disabled={isButtonDisabled}
-        style={[styles.button, { backgroundColor: isButtonDisabled ? '#bbbbbb' : '#2196F3' }]}
-        labelStyle={styles.buttonLabel}>
-        Calculate
-      </Button>
-      <Text style={styles.title}>BMR : {BMR} calories/day</Text>
-    </ScrollView>
+        <View style={styles.switchContainer}>
+          <Text style={styles.switchLabel}>Are you a male ?</Text>
+          <Switch
+            trackColor={{ false: '#767577', true: '#d1c4e9' }}
+            thumbColor={isMale ? '#ff4081' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitch}
+            value={isMale}
+          />
+        </View>
+        <TextInput
+          label="Height"
+          value={height}
+          onChangeText={setHeight}
+          keyboardType="numeric"
+          style={styles.decalageBottom}
+        />
+        <TextInput
+          label="Weight"
+          value={weight}
+          onChangeText={setWeight}
+          keyboardType="numeric"
+          style={styles.decalageBottom}
+        />
+        <View style={styles.decalageBottom}>
+          <Text style={styles.pickerLabel}>Activity Level</Text>
+          <Picker
+            selectedValue={activityLevel}
+            onValueChange={(itemValue) => setActivityLevel(itemValue)}
+            itemStyle={styles.pickerItem}
+            numberOfLines={2}>
+            {Array.from(allActivityLevels, ([key, value]) => (
+              <Picker.Item key={value} label={value} value={value} />
+            ))}
+          </Picker>
+        </View>
+        <View style={styles.decalageBottom}>
+          <Text style={styles.pickerLabel}>Health Goal</Text>
+          <Picker
+            selectedValue={healthGoal}
+            onValueChange={(itemValue) => setHealthGoal(itemValue)}
+            itemStyle={styles.pickerItem}>
+            {Array.from(allHealthGoals, ([key, value]) => (
+              <Picker.Item key={value} label={value} value={value} />
+            ))}
+          </Picker>
+        </View>
+        <Button
+          onPress={() =>
+            setBMR(calculateBMR(age, isMale, height, weight, activityLevel, healthGoal))
+          }
+          disabled={isButtonDisabled}
+          style={[styles.button, { backgroundColor: isButtonDisabled ? '#bbbbbb' : '#2196F3' }]}
+          labelStyle={styles.buttonLabel}>
+          Calculate
+        </Button>
+        <Text style={styles.title}>BMR : {BMR} calories/day</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
