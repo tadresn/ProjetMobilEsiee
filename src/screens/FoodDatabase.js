@@ -1,4 +1,5 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } from 'react-native';
 import { Searchbar, Button, TextInput } from 'react-native-paper';
@@ -18,7 +19,7 @@ const FoodDatabase = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
   const [quantityFood, setQuantityFood] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dateFood, setDateFood] = useState(new Date());
   const [meal, setMeal] = useState(allMeal.get('Breaskfast'));
 
   async function handleSearch() {
@@ -42,6 +43,11 @@ const FoodDatabase = () => {
   const openModal = (food) => {
     setSelectedFood(food);
     setModalVisible(true);
+  };
+
+  const handleDate = (event, selectedDate) => {
+    const currentDate = selectedDate || dateFood;
+    setDateFood(currentDate);
   };
 
   return (
@@ -121,7 +127,9 @@ const FoodDatabase = () => {
             }}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text>Please fill in the fields to add the dish.</Text>
+                <Text style={[styles.label, styles.centerText]}>
+                  Please fill in the fields to add the food.
+                </Text>
                 <TextInput
                   label="Food"
                   value={selectedFood}
@@ -133,15 +141,29 @@ const FoodDatabase = () => {
                   value={quantityFood}
                   onChangeText={setQuantityFood}
                   keyboardType="numeric"
+                  style={styles.decalageBottom}
                 />
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  onChange={(event, selectedDate) => {
-                    setSelectedDate(selectedDate);
-                  }}
-                  minimumDate={new Date()}
-                />
+                <View style={styles.dateTimeContainer}>
+                  <Text style={styles.pickerLabel}>Date</Text>
+                  <DateTimePicker
+                    value={dateFood}
+                    mode="date"
+                    onChange={handleDate}
+                    minimumDate={new Date()}
+                    style={styles.decalageBottom}
+                  />
+                </View>
+                <View style={styles.decalageBottom}>
+                  <Text style={styles.pickerLabel}>Meal</Text>
+                  <Picker
+                    selectedValue={meal}
+                    onValueChange={(meal) => setMeal(meal)}
+                    itemStyle={styles.pickerItem}>
+                    {Array.from(allMeal, ([key, value]) => (
+                      <Picker.Item key={value} label={value} value={value} />
+                    ))}
+                  </Picker>
+                </View>
                 <Button onPress={() => setModalVisible(!modalVisible)}>
                   <Text>Close</Text>
                 </Button>
@@ -231,6 +253,19 @@ const styles = StyleSheet.create({
   disabledTextInput: {
     backgroundColor: '#f2f2f2',
     color: '#888888',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  pickerItem: {
+    height: 50,
+  },
+  pickerLabel: {
+    marginBottom: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  dateTimeContainer: {
+    alignItems: 'flex-start',
   },
 });
 
