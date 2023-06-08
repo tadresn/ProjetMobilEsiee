@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } fr
 import { Searchbar, Button, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { storeData } from '../context/storage';
 import { searchFoodByName } from '../services/FoodDatabaseService';
 
 const FoodDatabase = () => {
@@ -18,9 +19,19 @@ const FoodDatabase = () => {
   const [resultAPI, setResultAPI] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
+  const [selectedEnergy, setSelectedEnergy] = useState(null);
   const [quantityFood, setQuantityFood] = useState(null);
   const [dateFood, setDateFood] = useState(new Date());
-  const [meal, setMeal] = useState(allMeal.get('Breaskfast'));
+  const [meal, setMeal] = useState(allMeal.get('Breakfast'));
+
+  const storeFood = async () => {
+    const data = {
+      Food: selectedFood,
+      Energy: selectedEnergy,
+      Quantity: quantityFood,
+    };
+    await storeData(dateFood.toISOString().toString(), meal.toString(), data);
+  };
 
   async function handleSearch() {
     await searchFoodByName(userSearch)
@@ -40,8 +51,9 @@ const FoodDatabase = () => {
     handleSearch();
   };
 
-  const openModal = (food) => {
+  const openModal = (food, energy) => {
     setSelectedFood(food);
+    setSelectedEnergy(energy);
     setModalVisible(true);
   };
 
@@ -112,7 +124,7 @@ const FoodDatabase = () => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => openModal(hint.food.label)}
+                onPress={() => openModal(hint.food.label, hint.food.nutrients.ENERC_KCAL)}
                 style={styles.openModalButton}>
                 <Text style={styles.textStyle}>Add to my meal</Text>
               </TouchableOpacity>
@@ -164,9 +176,17 @@ const FoodDatabase = () => {
                     ))}
                   </Picker>
                 </View>
-                <Button onPress={() => setModalVisible(!modalVisible)}>
-                  <Text>Close</Text>
-                </Button>
+                <View style={styles.buttonContainer}>
+                  <Button style={[styles.button, styles.addButton]} onPress={storeFood}>
+                    <Text style={styles.textStyle}>Add</Text>
+                  </Button>
+
+                  <Button
+                    style={styles.button}
+                    onPress={() => setModalVisible(!modalVisible)}>
+                    <Text>Close</Text>
+                  </Button>
+                </View>
               </View>
             </View>
           </Modal>
@@ -266,6 +286,18 @@ const styles = StyleSheet.create({
   },
   dateTimeContainer: {
     alignItems: 'flex-start',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 16,
+  },
+  button: {
+    borderRadius: 4,
+    marginLeft: 8,
+  },
+  addButton: {
+    backgroundColor: '#a692c7',
   },
 });
 
