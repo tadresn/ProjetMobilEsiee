@@ -1,16 +1,25 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } from 'react-native';
-import { Searchbar, Button } from 'react-native-paper';
-import { DatePickerInput } from 'react-native-paper-dates';
+import { Searchbar, Button, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { searchFoodByName } from '../services/FoodDatabaseService';
 
 const FoodDatabase = () => {
+  const allMeal = new Map([
+    ['Breakfast', 'Breakfast'],
+    ['Lunch', 'Lunch'],
+    ['Snack', 'Snack'],
+    ['Dinner', 'Dinner'],
+  ]);
   const [userSearch, setUserSearch] = useState('');
   const [resultAPI, setResultAPI] = useState(null);
-  const [currentFood, setCurrentFood] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedFood, setSelectedFood] = useState(null);
+  const [quantityFood, setQuantityFood] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [meal, setMeal] = useState(allMeal.get('Breaskfast'));
 
   async function handleSearch() {
     await searchFoodByName(userSearch)
@@ -30,9 +39,8 @@ const FoodDatabase = () => {
     handleSearch();
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
   const openModal = (food) => {
-    setCurrentFood(food);
+    setSelectedFood(food);
     setModalVisible(true);
   };
 
@@ -113,18 +121,26 @@ const FoodDatabase = () => {
             }}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <Text>Bonjour tout le monde ! {currentFood}</Text>
-                <DatePickerInput
-                  locale="en-GB"
-                  label="Sélectionner une date"
+                <Text>Please fill in the fields to add the dish.</Text>
+                <TextInput
+                  label="Food"
+                  value={selectedFood}
+                  editable={false}
+                  style={styles.disabledTextInput}
+                />
+                <TextInput
+                  label="Quantity"
+                  value={quantityFood}
+                  onChangeText={setQuantityFood}
+                  keyboardType="numeric"
+                />
+                <DateTimePicker
                   value={selectedDate}
                   mode="date"
                   onChange={(event, selectedDate) => {
                     setSelectedDate(selectedDate);
                   }}
-                  onConfirm={(date) => {
-                    setSelectedDate(date);
-                  }}
+                  minimumDate={new Date()}
                 />
                 <Button onPress={() => setModalVisible(!modalVisible)}>
                   <Text>Close</Text>
@@ -211,6 +227,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '80%',
     maxHeight: '80%',
+  },
+  disabledTextInput: {
+    backgroundColor: '#f2f2f2',
+    color: '#888888',
   },
 });
 
