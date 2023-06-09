@@ -32,6 +32,9 @@ const FoodDatabase = () => {
       Quantity: quantityFood,
     };
     await storeData(dateFood.toDateString(), meal.toString(), data);
+    setModalVisible(false);
+    setDateFood(new Date());
+    setQuantityFood(null);
   };
 
   async function handleSearch() {
@@ -57,6 +60,12 @@ const FoodDatabase = () => {
     setSelectedEnergy(energy);
     setModalVisible(true);
   };
+
+  const closeModal = () => {
+    setDateFood(new Date());
+    setQuantityFood(null);
+    setModalVisible(!modalVisible);
+  }
 
   const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || dateFood;
@@ -187,7 +196,7 @@ const FoodDatabase = () => {
                   <Button style={[styles.button, styles.addButton]} onPress={storeFood}>
                     <Text style={styles.textStyle}>Add</Text>
                   </Button>
-                  <Button style={styles.button} onPress={() => setModalVisible(!modalVisible)}>
+                  <Button style={styles.button} onPress={closeModal}>
                     Close
                   </Button>
                 </View>
