@@ -30,7 +30,7 @@ const FoodDatabase = () => {
       Energy: selectedEnergy,
       Quantity: quantityFood,
     };
-    await storeData(dateFood.toISOString().toString(), meal.toString(), data);
+    await storeData(dateFood.toDateString(), meal.toString(), data);
   };
 
   async function handleSearch() {
@@ -180,11 +180,8 @@ const FoodDatabase = () => {
                   <Button style={[styles.button, styles.addButton]} onPress={storeFood}>
                     <Text style={styles.textStyle}>Add</Text>
                   </Button>
-
-                  <Button
-                    style={styles.button}
-                    onPress={() => setModalVisible(!modalVisible)}>
-                    <Text>Close</Text>
+                  <Button style={styles.button} onPress={() => setModalVisible(!modalVisible)}>
+                    Close
                   </Button>
                 </View>
               </View>
