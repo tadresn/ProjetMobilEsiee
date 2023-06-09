@@ -23,6 +23,7 @@ const FoodDatabase = () => {
   const [quantityFood, setQuantityFood] = useState(null);
   const [dateFood, setDateFood] = useState(new Date());
   const [meal, setMeal] = useState(allMeal.get('Breakfast'));
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
   const storeFood = async () => {
     const data = {
@@ -60,6 +61,7 @@ const FoodDatabase = () => {
   const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || dateFood;
     setDateFood(currentDate);
+    setShowDateTimePicker(false);
   };
 
   return (
@@ -155,8 +157,13 @@ const FoodDatabase = () => {
                   keyboardType="numeric"
                   style={styles.decalageBottom}
                 />
-                <View style={styles.dateTimeContainer}>
+                <TouchableOpacity
+                  onPress={() => setShowDateTimePicker(true)}
+                  style={styles.dateTimeContainer}>
                   <Text style={styles.pickerLabel}>Date</Text>
+                  <Text>{dateFood.toDateString()}</Text> 
+                </TouchableOpacity>
+                {showDateTimePicker && (
                   <DateTimePicker
                     value={dateFood}
                     mode="date"
@@ -164,7 +171,7 @@ const FoodDatabase = () => {
                     minimumDate={new Date()}
                     style={styles.decalageBottom}
                   />
-                </View>
+                )}
                 <View style={styles.decalageBottom}>
                   <Text style={styles.pickerLabel}>Meal</Text>
                   <Picker

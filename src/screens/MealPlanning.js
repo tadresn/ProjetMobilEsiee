@@ -1,6 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,11 +9,13 @@ import { retrieveData } from '../context/storage';
 const MealPlanning = () => {
   const [date, setDate] = useState(new Date());
   const [mealData, setMealData] = useState(null);
+  const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
   const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDate(currentDate);
     getFoodData(currentDate);
+    setShowDateTimePicker(false);
   };
 
   const getFoodData = async (selectedDate) => {
@@ -64,13 +66,21 @@ const MealPlanning = () => {
       <ScrollView>
         <View style={styles.content}>
           <Text style={styles.label}>Meals for:</Text>
-          <DateTimePicker
-            value={date}
-            mode="date"
-            onChange={handleDate}
-            minimumDate={new Date()}
-            style={styles.dateTimePicker}
-          />
+          <TouchableOpacity
+            onPress={() => setShowDateTimePicker(true)}
+            style={styles.dateTimeContainer}>
+            <Text style={styles.pickerLabel}>Date</Text>
+            <Text>{date.toDateString()}</Text> 
+          </TouchableOpacity>
+          {showDateTimePicker && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              onChange={handleDate}
+              minimumDate={new Date()}
+              style={styles.dateTimePicker}
+            />
+          )}
           <Button onPress={onClickButton}>
             <Text>Press</Text>
           </Button>
