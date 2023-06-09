@@ -59,14 +59,14 @@ const HealthGoals = () => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Health Goals</Text>
         <TextInput
-          label="Age"
+          label="Age *"
           value={age}
           onChangeText={setAge}
           keyboardType="numeric"
           style={styles.decalageBottom}
         />
         <View style={styles.switchContainer}>
-          <Text style={styles.switchLabel}>Are you a male ?</Text>
+          <Text style={styles.switchLabel}>Are you a male ? *</Text>
           <Switch
             trackColor={{ false: '#767577', true: '#d1c4e9' }}
             thumbColor={isMale ? '#ff4081' : '#f4f3f4'}
@@ -76,21 +76,21 @@ const HealthGoals = () => {
           />
         </View>
         <TextInput
-          label="Height"
+          label="Height *"
           value={height}
           onChangeText={setHeight}
           keyboardType="numeric"
           style={styles.decalageBottom}
         />
         <TextInput
-          label="Weight"
+          label="Weight *"
           value={weight}
           onChangeText={setWeight}
           keyboardType="numeric"
           style={styles.decalageBottom}
         />
         <View style={styles.decalageBottom}>
-          <Text style={styles.pickerLabel}>Activity Level</Text>
+          <Text style={styles.pickerLabel}>Activity Level *</Text>
           <Picker
             selectedValue={activityLevel}
             onValueChange={(itemValue) => setActivityLevel(itemValue)}
@@ -102,7 +102,7 @@ const HealthGoals = () => {
           </Picker>
         </View>
         <View style={styles.decalageBottom}>
-          <Text style={styles.pickerLabel}>Health Goal</Text>
+          <Text style={styles.pickerLabel}>Health Goal *</Text>
           <Picker
             selectedValue={healthGoal}
             onValueChange={(itemValue) => setHealthGoal(itemValue)}
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    marginTop: 20
+    marginTop: 20,
   },
 });
 

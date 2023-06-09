@@ -1,6 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } from 'react-native';
 import { Searchbar, Button, TextInput } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,8 +24,10 @@ const FoodDatabase = () => {
   const [dateFood, setDateFood] = useState(new Date());
   const [meal, setMeal] = useState(allMeal.get('Breakfast'));
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const storeFood = async () => {
+    setModalVisible(false);
     const data = {
       Food: selectedFood,
       Energy: selectedEnergy,
@@ -33,8 +35,6 @@ const FoodDatabase = () => {
     };
     await storeData(dateFood.toDateString(), meal.toString(), data);
     setModalVisible(false);
-    setDateFood(new Date());
-    setQuantityFood(null);
   };
 
   async function handleSearch() {
@@ -59,19 +59,29 @@ const FoodDatabase = () => {
     setSelectedFood(food);
     setSelectedEnergy(energy);
     setModalVisible(true);
+    setMeal(allMeal.get('Breakfast'));
+    setDateFood(new Date());
+    setQuantityFood(null);
+    setShowDateTimePicker(false);
   };
 
   const closeModal = () => {
-    setDateFood(new Date());
-    setQuantityFood(null);
     setModalVisible(!modalVisible);
-  }
+  };
 
   const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || dateFood;
     setDateFood(currentDate);
     setShowDateTimePicker(false);
   };
+
+  useEffect(() => {
+    if (quantityFood) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [quantityFood]);
 
   return (
     <SafeAreaView>
@@ -103,36 +113,46 @@ const FoodDatabase = () => {
                 </View>
               )}
               <View style={styles.nutrientsContainer}>
-                <View style={styles.nutrientRow}>
-                  <Text style={styles.nutrientLabel}>Energy</Text>
-                  <Text style={styles.nutrientValue}>
-                    {hint.food.nutrients.ENERC_KCAL} kcal per 100 grams
-                  </Text>
-                </View>
-                <View style={styles.nutrientRow}>
-                  <Text style={styles.nutrientLabel}>Protein</Text>
-                  <Text style={styles.nutrientValue}>
-                    {hint.food.nutrients.PROCNT} g per 100 grams
-                  </Text>
-                </View>
-                <View style={styles.nutrientRow}>
-                  <Text style={styles.nutrientLabel}>Fat</Text>
-                  <Text style={styles.nutrientValue}>
-                    {hint.food.nutrients.FAT} g per 100 grams
-                  </Text>
-                </View>
-                <View style={styles.nutrientRow}>
-                  <Text style={styles.nutrientLabel}>Carbohydrates</Text>
-                  <Text style={styles.nutrientValue}>
-                    {hint.food.nutrients.CHOCDF} g per 100 grams
-                  </Text>
-                </View>
-                <View style={styles.nutrientRow}>
-                  <Text style={styles.nutrientLabel}>Dietary fiber</Text>
-                  <Text style={styles.nutrientValue}>
-                    {hint.food.nutrients.FIBTG} g per 100 grams
-                  </Text>
-                </View>
+                {hint.food.nutrients.ENERC_KCAL && (
+                  <View style={styles.nutrientRow}>
+                    <Text style={styles.nutrientLabel}>Energy</Text>
+                    <Text style={styles.nutrientValue}>
+                      {hint.food.nutrients.ENERC_KCAL.toFixed(2)} kcal per 100 grams
+                    </Text>
+                  </View>
+                )}
+                {hint.food.nutrients.PROCNT && (
+                  <View style={styles.nutrientRow}>
+                    <Text style={styles.nutrientLabel}>Protein</Text>
+                    <Text style={styles.nutrientValue}>
+                      {hint.food.nutrients.PROCNT.toFixed(2)} g per 100 grams
+                    </Text>
+                  </View>
+                )}
+                {hint.food.nutrients.FAT && (
+                  <View style={styles.nutrientRow}>
+                    <Text style={styles.nutrientLabel}>Fat</Text>
+                    <Text style={styles.nutrientValue}>
+                      {hint.food.nutrients.FAT.toFixed(2)} g per 100 grams
+                    </Text>
+                  </View>
+                )}
+                {hint.food.nutrients.CHOCDF && (
+                  <View style={styles.nutrientRow}>
+                    <Text style={styles.nutrientLabel}>Carbohydrates</Text>
+                    <Text style={styles.nutrientValue}>
+                      {hint.food.nutrients.CHOCDF.toFixed(2)} g per 100 grams
+                    </Text>
+                  </View>
+                )}
+                {hint.food.nutrients.FIBTG && (
+                  <View style={styles.nutrientRow}>
+                    <Text style={styles.nutrientLabel}>Dietary fiber</Text>
+                    <Text style={styles.nutrientValue}>
+                      {hint.food.nutrients.FIBTG.toFixed(2)} g per 100 grams
+                    </Text>
+                  </View>
+                )}
               </View>
               <TouchableOpacity
                 onPress={() => openModal(hint.food.label, hint.food.nutrients.ENERC_KCAL)}
@@ -160,17 +180,18 @@ const FoodDatabase = () => {
                   style={styles.disabledTextInput}
                 />
                 <TextInput
-                  label="Quantity"
+                  label="Quantity *"
                   value={quantityFood}
                   onChangeText={setQuantityFood}
                   keyboardType="numeric"
                   style={styles.decalageBottom}
                 />
+                <Text style={styles.pickerLabel}>Date</Text>
+                <Text style={styles.decalageBottom}>Chosen date : {dateFood.toDateString()}</Text>
                 <TouchableOpacity
                   onPress={() => setShowDateTimePicker(true)}
                   style={styles.dateTimeContainer}>
-                  <Text style={styles.pickerLabel}>Date</Text>
-                  <Text>{dateFood.toDateString()}</Text> 
+                  <Text style={styles.clickableText}>Click here to modify the date</Text>
                 </TouchableOpacity>
                 {showDateTimePicker && (
                   <DateTimePicker
@@ -193,7 +214,13 @@ const FoodDatabase = () => {
                   </Picker>
                 </View>
                 <View style={styles.buttonContainer}>
-                  <Button style={[styles.button, styles.addButton]} onPress={storeFood}>
+                  <Button
+                    style={[
+                      styles.button,
+                      { backgroundColor: isButtonDisabled ? '#bbbbbb' : '#a692c7' },
+                    ]}
+                    onPress={storeFood}
+                    disabled={isButtonDisabled}>
                     <Text style={styles.textStyle}>Add</Text>
                   </Button>
                   <Button style={styles.button} onPress={closeModal}>
@@ -309,8 +336,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: 8,
   },
-  addButton: {
-    backgroundColor: '#a692c7',
+  clickableText: {
+    color: '#0000FF',
+    textDecorationLine: 'underline',
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
 });
 
