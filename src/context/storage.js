@@ -38,3 +38,38 @@ export const retrieveData = async (date) => {
     return null;
   }
 };
+
+export const deleteData = async (date, meal, foodData) => {
+  try {
+    const storedData = await AsyncStorage.getItem(date);
+
+    if (storedData) {
+      const existingData = JSON.parse(storedData);
+
+      const mealData = existingData[meal];
+      const index = mealData.findIndex(
+        (item) =>
+          item.Food === foodData.Food &&
+          item.Energy === foodData.Energy &&
+          item.Quantity === foodData.Quantity
+      );
+
+      if (index !== -1) {
+        mealData.splice(index, 1);
+
+        if (
+          existingData['Breakfast'].length === 0 &&
+          existingData['Lunch'].length === 0 &&
+          existingData['Snack'].length === 0 &&
+          existingData['Dinner'].length === 0
+        ) {
+          await AsyncStorage.removeItem(date);
+        } else {
+          await AsyncStorage.setItem(date, JSON.stringify(existingData));
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting data:', error);
+  }
+};

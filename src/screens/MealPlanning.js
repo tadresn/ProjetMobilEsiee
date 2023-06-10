@@ -1,19 +1,30 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { retrieveData } from '../context/storage';
+import { deleteData, retrieveData } from '../context/storage';
 
 const MealPlanning = () => {
   const [date, setDate] = useState(new Date());
   const [mealData, setMealData] = useState(null);
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
+  useEffect(() => {
+    getFoodData(date);
+  }, [date]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getFoodData(date);
+    }, [date])
+  );
+
   const handleDate = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDate(currentDate);
-    getFoodData(currentDate);
     setShowDateTimePicker(false);
   };
 
@@ -31,67 +42,86 @@ const MealPlanning = () => {
     return totalEnergy;
   };
 
+  const deleteFood = async (meal, data) => {
+    await deleteData(date.toDateString(), meal, data);
+    getFoodData(date);
+  };
+
   const renderMealTable = (mealName, mealData) => {
+    if (mealData.length === 0) {
+      return (
+        <View style={styles.mealTable}>
+          <Text style={[styles.importantText, styles.decalageBottom]}>{mealName}</Text>
+          <Text style={[styles.tableCell, styles.decalageBottom]}>Nothing</Text>
+        </View>
+      );
+    }
     return (
       <View style={styles.mealTable}>
-        <Text style={styles.mealName}>{mealName}</Text>
+        <Text style={[styles.importantText, styles.decalageBottom]}>{mealName}</Text>
         <View style={styles.tableRow}>
-          <Text style={styles.tableHeader}>Food</Text>
-          <Text style={styles.tableHeader}>Energy (kcal per 100g)</Text>
-          <Text style={styles.tableHeader}>Total Energy</Text>
+          <Text style={styles.importantTextMeal}>Food</Text>
+          <Text style={styles.importantTextMeal}>Energy (kcal per 100g)</Text>
+          <Text style={styles.importantTextMeal}>Energy for your quantity</Text>
+          <Text style={styles.importantTextMeal}>Delete</Text>
         </View>
         {mealData.map((food, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>{food.Food}</Text>
             <Text style={styles.tableCell}>{food.Energy}</Text>
-            <Text style={styles.tableCell}>{(food.Quantity * food.Energy) / 100}</Text>
+            <Text style={styles.tableCell}>
+              {(food.Quantity * food.Energy) / 100} ({food.Quantity}g)
+            </Text>
+            <IconButton
+              icon="close"
+              iconColor="red"
+              style={[styles.tableCell, { marginTop: -10 }]}
+              onPress={() => deleteFood(mealName, food)}
+            />
           </View>
         ))}
-        <View style={styles.totalRow}>
-          <Text style={styles.totalLabel}>Total Energy</Text>
-          <Text style={styles.totalValue}>{calculateTotalEnergy(mealData)}</Text>
-        </View>
+        <Text style={[styles.importantTextMeal, styles.decalageTop]}>
+          Total Energy : {calculateTotalEnergy(mealData)} kcal
+        </Text>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.content}>
-          <Text style={styles.label}>Meals for:</Text>
-          <TouchableOpacity
+      <View style={styles.dateTimeContainer}>
+        <View style={styles.centerContainer}>
+          <Text style={styles.importantText}>{date.toDateString()}</Text>
+          <IconButton
+            icon="pencil"
+            iconColor="#ff4081"
             onPress={() => setShowDateTimePicker(true)}
-            style={styles.dateTimeContainer}>
-            <Text style={styles.pickerLabel}>Date</Text>
-            <Text>{date.toDateString()}</Text>
-          </TouchableOpacity>
-          {showDateTimePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              onChange={handleDate}
-              minimumDate={new Date()}
-              style={styles.dateTimePicker}
-            />
-          )}
+          />
         </View>
-        {mealData && (
+        {showDateTimePicker && (
+          <DateTimePicker value={date} mode="date" onChange={handleDate} minimumDate={new Date()} />
+        )}
+      </View>
+      <ScrollView>
+        {mealData ? (
           <View>
             {mealData.Breakfast && renderMealTable('Breakfast', mealData.Breakfast)}
             {mealData.Lunch && renderMealTable('Lunch', mealData.Lunch)}
             {mealData.Snack && renderMealTable('Snack', mealData.Snack)}
             {mealData.Dinner && renderMealTable('Dinner', mealData.Dinner)}
-            <View style={styles.totalEnergyContainer}>
-              <Text style={styles.totalEnergyLabel}>Total Energy for all meals:</Text>
+            <View style={styles.decalageTop}>
+              <Text style={styles.importantText}>Total Energy for the day:</Text>
               <Text style={styles.totalEnergyValue}>
                 {calculateTotalEnergy(mealData.Breakfast) +
                   calculateTotalEnergy(mealData.Lunch) +
                   calculateTotalEnergy(mealData.Snack) +
-                  calculateTotalEnergy(mealData.Dinner)}
+                  calculateTotalEnergy(mealData.Dinner)}{' '}
+                kcal
               </Text>
             </View>
           </View>
+        ) : (
+          <Text style={[styles.importantText, styles.decalageTop]}>No meals scheduled</Text>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -102,62 +132,63 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#FFFFFF',
   },
-  content: {
+  dateTimeContainer: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    justifyContent: 'center',
+    backgroundColor: '#d1c4e9',
+  },
+  centerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  label: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  dateTimePicker: {
-    alignSelf: 'flex-start',
+    marginLeft: 55,
   },
   mealTable: {
     marginVertical: 16,
-  },
-  mealName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 4,
+    padding: 8,
+    backgroundColor: '#F5F5F5',
   },
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  tableHeader: {
-    fontWeight: 'bold',
+    marginBottom: 16,
   },
   tableCell: {
     flex: 1,
+    textAlign: 'center',
+    color: '#333333',
   },
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-  totalLabel: {
+  importantTextMeal: {
     fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+    color: '#333333',
   },
-  totalValue: {
-    fontWeight: 'bold',
-    color: 'blue',
-  },
-  totalEnergyContainer: {
-    alignItems: 'center',
+  decalageTop: {
     marginTop: 16,
   },
-  totalEnergyLabel: {
+  decalageBottom: {
+    marginBottom: 16,
+  },
+  importantText: {
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333333',
   },
   totalEnergyValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'blue',
+    color: '#333333',
+    textAlign: 'center',
   },
 });
 

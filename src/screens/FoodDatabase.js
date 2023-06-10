@@ -2,7 +2,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } from 'react-native';
-import { Searchbar, Button, TextInput } from 'react-native-paper';
+import { Searchbar, Button, TextInput, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { storeData } from '../context/storage';
@@ -113,47 +113,58 @@ const FoodDatabase = () => {
                 </View>
               )}
               <View style={styles.nutrientsContainer}>
-                {hint.food.nutrients.ENERC_KCAL && (
-                  <View style={styles.nutrientRow}>
-                    <Text style={styles.nutrientLabel}>Energy</Text>
+                <View style={styles.nutrientRow}>
+                  <Text style={styles.nutrientLabel}>Energy</Text>
+                  {hint.food.nutrients.ENERC_KCAL ? (
                     <Text style={styles.nutrientValue}>
                       {hint.food.nutrients.ENERC_KCAL.toFixed(2)} kcal per 100 grams
                     </Text>
-                  </View>
-                )}
-                {hint.food.nutrients.PROCNT && (
-                  <View style={styles.nutrientRow}>
-                    <Text style={styles.nutrientLabel}>Protein</Text>
+                  ) : (
+                    <Text style={styles.nutrientValue}>0 kcal per 100 grams</Text>
+                  )}
+                </View>
+                <View style={styles.nutrientRow}>
+                  <Text style={styles.nutrientLabel}>Protein</Text>
+                  {hint.food.nutrients.PROCNT ? (
                     <Text style={styles.nutrientValue}>
                       {hint.food.nutrients.PROCNT.toFixed(2)} g per 100 grams
                     </Text>
-                  </View>
-                )}
-                {hint.food.nutrients.FAT && (
-                  <View style={styles.nutrientRow}>
-                    <Text style={styles.nutrientLabel}>Fat</Text>
+                  ) : (
+                    <Text style={styles.nutrientValue}>0 g per 100 grams</Text>
+                  )}
+                </View>
+                <View style={styles.nutrientRow}>
+                  <Text style={styles.nutrientLabel}>Fat</Text>
+                  {hint.food.nutrients.FAT ? (
                     <Text style={styles.nutrientValue}>
                       {hint.food.nutrients.FAT.toFixed(2)} g per 100 grams
                     </Text>
-                  </View>
-                )}
-                {hint.food.nutrients.CHOCDF && (
-                  <View style={styles.nutrientRow}>
-                    <Text style={styles.nutrientLabel}>Carbohydrates</Text>
+                  ) : (
+                    <Text style={styles.nutrientValue}>0 g per 100 grams</Text>
+                  )}
+                </View>
+                <View style={styles.nutrientRow}>
+                  <Text style={styles.nutrientLabel}>Carbohydrates</Text>
+                  {hint.food.nutrients.CHOCDF ? (
                     <Text style={styles.nutrientValue}>
                       {hint.food.nutrients.CHOCDF.toFixed(2)} g per 100 grams
                     </Text>
-                  </View>
-                )}
-                {hint.food.nutrients.FIBTG && (
-                  <View style={styles.nutrientRow}>
-                    <Text style={styles.nutrientLabel}>Dietary fiber</Text>
+                  ) : (
+                    <Text style={styles.nutrientValue}>0 g per 100 grams</Text>
+                  )}
+                </View>
+                <View style={styles.nutrientRow}>
+                  <Text style={styles.nutrientLabel}>Dietary fiber</Text>
+                  {hint.food.nutrients.FIBTG ? (
                     <Text style={styles.nutrientValue}>
                       {hint.food.nutrients.FIBTG.toFixed(2)} g per 100 grams
                     </Text>
-                  </View>
-                )}
+                  ) : (
+                    <Text style={styles.nutrientValue}>0 g per 100 grams</Text>
+                  )}
+                </View>
               </View>
+
               <TouchableOpacity
                 onPress={() => openModal(hint.food.label, hint.food.nutrients.ENERC_KCAL)}
                 style={styles.openModalButton}>
@@ -187,12 +198,14 @@ const FoodDatabase = () => {
                   style={styles.decalageBottom}
                 />
                 <Text style={styles.pickerLabel}>Date</Text>
-                <Text style={styles.decalageBottom}>Chosen date : {dateFood.toDateString()}</Text>
-                <TouchableOpacity
-                  onPress={() => setShowDateTimePicker(true)}
-                  style={styles.dateTimeContainer}>
-                  <Text style={styles.clickableText}>Click here to modify the date</Text>
-                </TouchableOpacity>
+                <View style={styles.dateRow}>
+                  <Text style={styles.dateText}>{dateFood.toDateString()}</Text>
+                  <IconButton
+                    icon="pencil"
+                    iconColor="#ff4081"
+                    onPress={() => setShowDateTimePicker(true)}
+                  />
+                </View>
                 {showDateTimePicker && (
                   <DateTimePicker
                     value={dateFood}
@@ -224,7 +237,7 @@ const FoodDatabase = () => {
                     <Text style={styles.textStyle}>Add</Text>
                   </Button>
                   <Button style={styles.button} onPress={closeModal}>
-                    Close
+                    <Text>Close</Text>
                   </Button>
                 </View>
               </View>
@@ -324,9 +337,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  dateTimeContainer: {
-    alignItems: 'flex-start',
-  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
@@ -336,11 +346,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginLeft: 8,
   },
-  clickableText: {
-    color: '#0000FF',
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
-    marginBottom: 16,
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 18,
   },
 });
 
