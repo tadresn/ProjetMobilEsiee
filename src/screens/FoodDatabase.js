@@ -1,5 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Modal, TouchableOpacity } from 'react-native';
 import { Searchbar, Button, TextInput, IconButton } from 'react-native-paper';
@@ -75,13 +76,26 @@ const FoodDatabase = () => {
     setShowDateTimePicker(false);
   };
 
+  const route = useRoute();
+  const navigation = useNavigation();
+
   useEffect(() => {
     if (quantityFood) {
       setIsButtonDisabled(false);
     } else {
       setIsButtonDisabled(true);
     }
-  }, [quantityFood]);
+
+    const unsubscribe = navigation.addListener('blur', () => {
+      navigation.setParams({
+        dateFromRoute: undefined,
+        mealFromRoute: undefined,
+      });
+    });
+    return unsubscribe;
+  }, [quantityFood, navigation]);
+
+  const { dateFromRoute, mealFromRoute } = route.params || {};
 
   return (
     <SafeAreaView>
@@ -199,12 +213,18 @@ const FoodDatabase = () => {
                 />
                 <Text style={styles.pickerLabel}>Date</Text>
                 <View style={styles.dateRow}>
-                  <Text style={styles.dateText}>{dateFood.toDateString()}</Text>
-                  <IconButton
-                    icon="pencil"
-                    iconColor="#ff4081"
-                    onPress={() => setShowDateTimePicker(true)}
-                  />
+                  {dateFromRoute && mealFromRoute ? (
+                    <Text style={styles.styleText}>{dateFromRoute}</Text>
+                  ) : (
+                    <>
+                      <Text style={styles.styleText}>{dateFood.toDateString()}</Text>
+                      <IconButton
+                        icon="pencil"
+                        iconColor="#ff4081"
+                        onPress={() => setShowDateTimePicker(true)}
+                      />
+                    </>
+                  )}
                 </View>
                 {showDateTimePicker && (
                   <DateTimePicker
@@ -217,14 +237,18 @@ const FoodDatabase = () => {
                 )}
                 <View style={styles.decalageBottom}>
                   <Text style={styles.pickerLabel}>Meal</Text>
-                  <Picker
-                    selectedValue={meal}
-                    onValueChange={(meal) => setMeal(meal)}
-                    itemStyle={styles.pickerItem}>
-                    {Array.from(allMeal, ([key, value]) => (
-                      <Picker.Item key={value} label={value} value={value} />
-                    ))}
-                  </Picker>
+                  {dateFromRoute && mealFromRoute ? (
+                    <Text style={styles.styleText}>{mealFromRoute}</Text>
+                  ) : (
+                    <Picker
+                      selectedValue={meal}
+                      onValueChange={(meal) => setMeal(meal)}
+                      itemStyle={styles.pickerItem}>
+                      {Array.from(allMeal, ([key, value]) => (
+                        <Picker.Item key={value} label={value} value={value} />
+                      ))}
+                    </Picker>
+                  )}
                 </View>
                 <View style={styles.buttonContainer}>
                   <Button
@@ -237,7 +261,7 @@ const FoodDatabase = () => {
                     <Text style={styles.textStyle}>Add</Text>
                   </Button>
                   <Button style={styles.button} onPress={closeModal}>
-                    <Text>Close</Text>
+                    Close
                   </Button>
                 </View>
               </View>
@@ -350,7 +374,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  dateText: {
+  styleText: {
     fontSize: 18,
   },
 });

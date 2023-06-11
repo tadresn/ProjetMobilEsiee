@@ -1,8 +1,8 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { Button, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { deleteData, retrieveData } from '../context/storage';
@@ -47,12 +47,20 @@ const MealPlanning = () => {
     getFoodData(date);
   };
 
+  const navigation = useNavigation();
+  const navigateToDataBase = (dateFromRoute, mealFromRoute) => {
+    navigation.navigate('Food Database', { dateFromRoute, mealFromRoute });
+  };
+
   const renderMealTable = (mealName, mealData) => {
     if (mealData.length === 0) {
       return (
         <View style={styles.mealTable}>
           <Text style={[styles.importantText, styles.decalageBottom]}>{mealName}</Text>
           <Text style={[styles.tableCell, styles.decalageBottom]}>Nothing</Text>
+          <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>
+            Add Food
+          </Button>
         </View>
       );
     }
@@ -83,6 +91,7 @@ const MealPlanning = () => {
         <Text style={[styles.importantTextMeal, styles.decalageTop]}>
           Total Energy : {calculateTotalEnergy(mealData)} kcal
         </Text>
+        <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>Add Food</Button>
       </View>
     );
   };
@@ -115,13 +124,18 @@ const MealPlanning = () => {
                 {calculateTotalEnergy(mealData.Breakfast) +
                   calculateTotalEnergy(mealData.Lunch) +
                   calculateTotalEnergy(mealData.Snack) +
-                  calculateTotalEnergy(mealData.Dinner)}{' '}
+                  calculateTotalEnergy(mealData.Dinner)}
                 kcal
               </Text>
             </View>
           </View>
         ) : (
-          <Text style={[styles.importantText, styles.decalageTop]}>No meals scheduled</Text>
+          <View>
+            {renderMealTable('Breakfast', [])}
+            {renderMealTable('Lunch', [])}
+            {renderMealTable('Snack', [])}
+            {renderMealTable('Dinner', [])}
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
