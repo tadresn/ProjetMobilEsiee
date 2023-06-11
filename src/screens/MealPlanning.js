@@ -58,9 +58,11 @@ const MealPlanning = () => {
         <View style={styles.mealTable}>
           <Text style={[styles.importantText, styles.decalageBottom]}>{mealName}</Text>
           <Text style={[styles.tableCell, styles.decalageBottom]}>Nothing</Text>
-          <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>
-            Add Food
-          </Button>
+          {date.getDate() >= new Date().getDate() ? (
+            <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>
+              Add Food
+            </Button>
+          ) : null}
         </View>
       );
     }
@@ -71,7 +73,9 @@ const MealPlanning = () => {
           <Text style={styles.importantTextMeal}>Food</Text>
           <Text style={styles.importantTextMeal}>Energy (kcal per 100g)</Text>
           <Text style={styles.importantTextMeal}>Energy for your quantity</Text>
-          <Text style={styles.importantTextMeal}>Delete</Text>
+          {date.getDate() >= new Date().getDate() ? (
+            <Text style={styles.importantTextMeal}>Delete</Text>
+          ) : null}
         </View>
         {mealData.map((food, index) => (
           <View key={index} style={styles.tableRow}>
@@ -80,18 +84,24 @@ const MealPlanning = () => {
             <Text style={styles.tableCell}>
               {(food.Quantity * food.Energy) / 100} ({food.Quantity}g)
             </Text>
-            <IconButton
-              icon="close"
-              iconColor="red"
-              style={[styles.tableCell, { marginTop: -10 }]}
-              onPress={() => deleteFood(mealName, food)}
-            />
+            {date.getDate() >= new Date().getDate() ? (
+              <IconButton
+                icon="close"
+                iconColor="red"
+                style={[styles.tableCell, { marginTop: -10 }]}
+                onPress={() => deleteFood(mealName, food)}
+              />
+            ) : null}
           </View>
         ))}
         <Text style={[styles.importantTextMeal, styles.decalageTop]}>
           Total Energy : {calculateTotalEnergy(mealData)} kcal
         </Text>
-        <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>Add Food</Button>
+        {date.getDate() >= new Date().getDate() ? (
+          <Button onPress={() => navigateToDataBase(date.toDateString(), mealName)}>
+            Add Food
+          </Button>
+        ) : null}
       </View>
     );
   };
@@ -107,9 +117,7 @@ const MealPlanning = () => {
             onPress={() => setShowDateTimePicker(true)}
           />
         </View>
-        {showDateTimePicker && (
-          <DateTimePicker value={date} mode="date" onChange={handleDate} minimumDate={new Date()} />
-        )}
+        {showDateTimePicker && <DateTimePicker value={date} mode="date" onChange={handleDate} />}
       </View>
       <ScrollView>
         {mealData ? (

@@ -34,7 +34,11 @@ const FoodDatabase = () => {
       Energy: selectedEnergy,
       Quantity: quantityFood,
     };
-    await storeData(dateFood.toDateString(), meal.toString(), data);
+    if (dateFromRoute && mealFromRoute) {
+      await storeData(dateFromRoute, mealFromRoute, data);
+    } else {
+      await storeData(dateFood.toDateString(), meal.toString(), data);
+    }
     setModalVisible(false);
   };
 
@@ -180,7 +184,9 @@ const FoodDatabase = () => {
               </View>
 
               <TouchableOpacity
-                onPress={() => openModal(hint.food.label, hint.food.nutrients.ENERC_KCAL)}
+                onPress={() =>
+                  openModal(hint.food.label, hint.food.nutrients.ENERC_KCAL.toFixed(2))
+                }
                 style={styles.openModalButton}>
                 <Text style={styles.textStyle}>Add to my meal</Text>
               </TouchableOpacity>
