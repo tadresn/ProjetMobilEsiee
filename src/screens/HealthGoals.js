@@ -40,8 +40,8 @@ const HealthGoals = () => {
     else if (activityLevel === allActivityLevels.get('Heavy')) BMR *= 1.725;
     else if (activityLevel === allActivityLevels.get('Extra')) BMR *= 1.9;
 
-    if (healthGoal === allHealthGoals.get('Loss')) BMR -= 500;
-    else if (healthGoal === allHealthGoals.get('Gain')) BMR += 500;
+    if (healthGoal === allHealthGoals.get('Loss')) BMR -= BMR * 0.1;
+    else if (healthGoal === allHealthGoals.get('Gain')) BMR += BMR * 0.1;
 
     return Math.round(BMR);
   }
